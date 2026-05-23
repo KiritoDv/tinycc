@@ -6141,6 +6141,15 @@ special_math_val:
                 mk_pointer(&vtop->type);
                 vtop->r |= VT_LVAL;
                 indir();
+            } else if (tcc_state->dynsymtab_section &&
+                       (s->type.t & VT_BTYPE) != VT_FUNC) {
+                const char *sym_name = get_tok_str(s->v, NULL);
+                if (sym_name && find_elf_sym(tcc_state->dynsymtab_section, sym_name)) {
+                    s->a.dllimport = 1;
+                    mk_pointer(&vtop->type);
+                    vtop->r |= VT_LVAL;
+                    indir();
+                }
             }
 #endif
         } else if (r == VT_CONST && IS_ENUM_VAL(s->type.t)) {
